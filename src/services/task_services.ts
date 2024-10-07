@@ -10,8 +10,14 @@ type newTaskRequest = {
     date_task: Date
 }
 
-type findTaskResquest = {
+type findTaskRequest = {
     id: string
+}
+
+type updateTaskRequest = {
+id: string,
+description: string,
+date_task: Date
 }
 
 export class TaskService {
@@ -23,7 +29,7 @@ export class TaskService {
         return task
     }
 
-    async readOneTask({ id }: findTaskResquest): Promise<Task | Error> {
+    async readOneTask({ id }: findTaskRequest): Promise<Task | Error> {
 
         const task = await cursor.findOne({ where: { id } })
         if (!task) {
@@ -34,14 +40,31 @@ export class TaskService {
     }
 
     async redAllTask() {
+ const tasks = await cursor.find()
+ return tasks
+    }
+
+    async updateTask({id, description, date_task} : updateTaskRequest): Promise<Task | Error> {
+          const task = await cursor.findOne({where:{id,}})
+          if (!task) {
+            return new Error("Task not found!")
+        }
+
+task.description = description ? description : task.description
+task.date_task = date_task ? date_task : task.date_task
+
+await cursor.save(task)
+         
+        return task
 
     }
 
-    async updateTask() {
-
+    async deleteTask({ id }: findTaskRequest): Promise<String | Error> {
+      const task = await cursor.findOne({where:{id,}})
+      if (!task) {
+        return new Error("Task not found!")
     }
-
-    async deleteTask() {
-
+    await cursor.delete(task.id)
+        return "Task removed sucessfully!"
     }
-}
+} 
